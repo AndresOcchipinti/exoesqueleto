@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Plano 04 · Exoesqueleto neumático de miembro inferior</title>
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+<style>
+  body{background:#08121b;color:#d6e4ee;font-family:system-ui,-apple-system,"Segoe UI",sans-serif}
+  .mono{font-family:ui-monospace,"Cascadia Mono",Consolas,monospace}
+  .panel{background:#0d1c29;border:1px solid #1c3347}
+  .chip{border:1px solid #24465f;background:#0a1824}
+  .chip.on{border-color:#22d3ee;background:#0b2a3a;box-shadow:0 0 0 1px #22d3ee33}
+  .tab[aria-selected=true]{color:#22d3ee;border-color:#22d3ee}
+  button:focus-visible{outline:2px solid #22d3ee;outline-offset:2px}
+  #cv{touch-action:none}
+</style>
+</head>
+<body>
+<header class="border-b border-[#1c3347] bg-[#0a1721]">
+  <div class="max-w-7xl mx-auto px-4 py-4 flex flex-wrap gap-4 justify-between items-start">
+    <div>
+      <h1 class="text-2xl font-semibold text-white">Exoesqueleto neumático de miembro inferior</h1>
+      <p class="text-cyan-300">Plano 04: modelo 3D y memoria interactiva</p>
+    </div>
+    <dl class="mono text-xs grid grid-cols-[auto_1fr] gap-x-3 gap-y-1 border border-[#24465f] p-3 bg-[#0d1c29]">
+      <dt class="text-slate-400">Escuela</dt><dd>Escuela Industrial N° 9 “15 de Noviembre”</dd>
+      <dt class="text-slate-400">Materia</dt><dd>Laboratorio de Hidráulica y Neumática</dd>
+      <dt class="text-slate-400">Profesor</dt><dd>Steffen, Facundo</dd>
+      <dt class="text-slate-400">Alumnos</dt><dd>Occhipinti, Juan Andrés · Mainini Casal, Fermín</dd>
+      <dt class="text-slate-400">Planos</dt><dd>01 Neumático · 02 Eléctrico · 03 Flujo de control · 04 Modelo 3D</dd>
+      <dt class="text-slate-400">Fecha</dt><dd>20/10/2026 · Folio 4/4</dd>
+    </dl>
+  </div>
+</header>
+
+<main class="max-w-7xl mx-auto px-4 py-6 grid lg:grid-cols-[1.4fr_1fr] gap-6">
+  <section class="panel">
+    <div class="px-4 py-3 border-b border-[#1c3347] flex flex-wrap gap-2 items-center justify-between">
+      <h2 id="ttl" class="font-medium text-white">Rodilla y cilindro Airtac SDA40x80</h2>
+      <div class="flex flex-wrap gap-2">
+        <button id="bBike" aria-pressed="false" class="px-3 py-1.5 border border-dashed border-cyan-400 text-cyan-300 hover:bg-[#12293a]">Ejemplo: bicicleta</button>
+        <button id="bExt" class="px-3 py-1.5 bg-cyan-500 text-slate-950 font-medium hover:bg-cyan-400">Extender rodilla (4 bar)</button>
+        <button id="bRet" class="px-3 py-1.5 border border-[#2f5a7a] hover:bg-[#12293a]">Reposo / retraer</button>
+      </div>
+    </div>
+    <div class="relative">
+      <canvas id="cv" class="w-full block" style="height:min(70vh,560px)"></canvas>
+      <p class="absolute bottom-2 left-3 text-xs text-slate-400">Arrastrar: rotar · rueda: zoom · botón derecho: desplazar</p>
+    </div>
+    <div class="grid sm:grid-cols-4 gap-px bg-[#1c3347] border-t border-[#1c3347] mono text-sm">
+      <div class="bg-[#0d1c29] p-3"><div id="l1" class="text-slate-400 text-xs">Flexión de rodilla</div><div id="rAng" class="text-xl text-white">90°</div></div>
+      <div class="bg-[#0d1c29] p-3"><div id="l2" class="text-slate-400 text-xs">Carrera del vástago</div><div id="rStr" class="text-xl text-white">0 mm</div></div>
+      <div class="bg-[#0d1c29] p-3"><div id="l3" class="text-slate-400 text-xs">Fuerza (F = P·A)</div><div id="rF" class="text-xl text-white">0 N</div></div>
+      <div class="bg-[#0d1c29] p-3"><div class="text-slate-400 text-xs">Par en la rodilla</div><div id="rT" class="text-xl text-cyan-300">0 N·m</div></div>
+    </div>
+    <div id="desc" class="p-4 text-sm text-slate-300 border-t border-[#1c3347]">
+      El vástago empuja con <span class="mono text-cyan-300">F = 400 000 Pa × 12,57 cm² = 502,6 N</span> sobre una palanca excéntrica de
+      <span class="mono text-cyan-300">0,10 m</span> fija a la tibia. El par es <span class="mono">T = F · d</span>, donde d es la distancia perpendicular
+      entre el eje de la rodilla y la línea del cilindro: llega a <span class="mono text-cyan-300">50,26 N·m</span> cuando el cilindro es perpendicular a la palanca.
+      El par requerido para sostener la pierna es 29,4 N·m (117,7 N × 0,25 m), con un margen de 1,71×.
+    </div>
+  </section>
+
+  <section class="panel flex flex-col">
+    <div role="tablist" class="flex border-b border-[#1c3347]">
+      <button role="tab" data-t="neu" class="tab flex-1 py-3 border-b-2 border-transparent" aria-selected="true">Neumática</button>
+      <button role="tab" data-t="ele" class="tab flex-1 py-3 border-b-2 border-transparent" aria-selected="false">Electrónica</button>
+      <button role="tab" data-t="log" class="tab flex-1 py-3 border-b-2 border-transparent" aria-selected="false">Lógica</button>
+    </div>
+    <div id="tabBody" class="p-4 flex-1 text-sm"></div>
+  </section>
+
+  <section class="panel lg:col-span-2 p-4">
+    <h2 class="font-medium text-white mb-3">Resumen de verificación (cilindro de 40 mm · 75 kg · 4 bar)</h2>
+    <div class="overflow-x-auto">
+      <table class="w-full text-sm mono">
+        <thead class="text-slate-400 text-left"><tr><th class="py-1 pr-4 font-normal">Cálculo</th><th class="font-normal pr-4">Resultado</th><th class="font-normal">Estado</th></tr></thead>
+        <tbody class="divide-y divide-[#1c3347]">
+          <tr><td class="py-1.5 pr-4">Fuerza del cilindro</td><td class="pr-4">502,6 N vs 353 N requeridos</td><td class="text-emerald-400">Aprobado</td></tr>
+          <tr><td class="py-1.5 pr-4">Par en la rodilla</td><td class="pr-4">50,26 N·m vs 29,4 N·m</td><td class="text-emerald-400">Aprobado</td></tr>
+          <tr><td class="py-1.5 pr-4">Presión mínima (FS = 3)</td><td class="pr-4">2,81 bar, se trabaja a 4 bar</td><td class="text-emerald-400">Aprobado</td></tr>
+          <tr><td class="py-1.5 pr-4">Estabilidad estática</td><td class="pr-4">Ángulo máximo sin volcar 8,9°</td><td class="text-emerald-400">Aprobado</td></tr>
+          <tr><td class="py-1.5 pr-4">Autonomía eléctrica</td><td class="pr-4">1536 Wh / 85 W = 18,07 h teóricas</td><td class="text-emerald-400">Aprobado</td></tr>
+          <tr><td class="py-1.5 pr-4">Factor de seguridad (Al 7075-T6)</td><td class="pr-4">Muy superior al mínimo de 3× (ISO 13482)</td><td class="text-emerald-400">Aprobado</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+</main>
+
+<script>
+/* ---------- Contenido de pestañas ---------- */
+const chain = (items, hl) => `<div class="flex flex-col gap-1">${items.map((s,i)=>
+  `<div class="chip px-3 py-2 ${hl&&hl.includes(i)?'on':''}"><div class="text-white">${s[0]}</div><div class="text-slate-400 text-xs">${s[1]}</div></div>${i<items.length-1?'<div class="text-center text-cyan-400 leading-none">▼</div>':''}`).join('')}</div>`;
+
+const steps = [
+  ['Se energizan sensores, actuadores y ESP32','Inicio del sistema.'],
+  ['Los sensores esperan una señal','Inclinómetro, presión plantar y encoders en lectura continua.'],
+  ['¿El sensor detecta inclinación?','No: vuelve a esperar. Sí: continúa.'],
+  ['Los sensores mandan señal al ESP32','El usuario manifiesta la intención de avanzar.'],
+  ['El ESP32 activa la válvula','Pulso por GPIO17 hacia el MOSFET y el solenoide de 24 V.'],
+  ['Se tensa la pierna de apoyo','La pierna de apoyo mantiene la presión máxima para sostener el peso.'],
+  ['El cilindro se extiende en la pierna que avanza','Fuerza de 502,6 N y par de 50,26 N·m en la rodilla.'],
+  ['La pierna de la persona avanza hacia adelante','Fase de balanceo asistida.'],
+  ['¿La persona se quiere seguir moviendo?','Sí: vuelve a esperar señal. No: fin.']
+];
+let cur = 0, timer = null;
+
+const tabs = {
+  neu: () => `<p class="text-slate-300 mb-3">Circuito de potencia a 4 bar (Plano 01).</p>` +
+    chain([
+      ['Fuente y acumulador de aire','Compresor brushless 24 V (15 L/min) y tanque'],
+      ['Regulador SMC AR20-02BG','Fija la presión de trabajo en 4 bar'],
+      ['Electroválvula Airtac 4V210-08','5/2 con solenoide de 24 V, comanda el sentido del cilindro'],
+      ['Cilindro Airtac SDA40x80','Doble efecto, Ø40 mm, vástago Ø14 mm']
+    ]) +
+    `<dl class="mono text-xs mt-4 grid grid-cols-[auto_1fr] gap-x-3 gap-y-1">
+      <dt class="text-slate-400">Extensión</dt><dd>502,6 N (51,3 kgf)</dd>
+      <dt class="text-slate-400">Retracción</dt><dd>441,1 N (45,0 kgf)</dd>
+      <dt class="text-slate-400">Seguridad</dt><dd>Válvula de alivio, escape rápido, sensor de presión SMC PSE540A, parada de emergencia</dd></dl>`,
+  ele: () => `<p class="text-slate-300 mb-3">Circuito de control y potencia eléctrica (Plano 02).</p>` +
+    chain([
+      ['ESP32-S3','Lee sensores y genera el pulso en GPIO17'],
+      ['Resistencia de 220 Ω','Limita la corriente del pin hacia la compuerta'],
+      ['MOSFET canal N','Conmuta el solenoide; resistencia pull-down de 10 kΩ en la compuerta evita activaciones al arrancar'],
+      ['Solenoide 24 V con diodo flyback 1N4007','El diodo en antiparalelo absorbe el pico inductivo al cortar']
+    ]) +
+    `<p class="text-xs text-slate-400 mt-3">Alimentación: batería Li-Ion 24 V / 60 Ah (1536 Wh). Un pin de lectura detecta tensión en el puerto de carga y bloquea la marcha mientras el usuario está conectado a la red (interlock).</p>`,
+  log: () => `<p class="text-slate-300 mb-3">Diagrama de flujo de control (Plano 03). Avanzá paso a paso o reproducilo.</p>` +
+    chain(steps.map(s=>s), [cur]) +
+    `<div class="flex gap-2 mt-3">
+      <button id="lPrev" class="px-3 py-1.5 border border-[#2f5a7a] hover:bg-[#12293a]">Anterior</button>
+      <button id="lNext" class="px-3 py-1.5 bg-cyan-500 text-slate-950 font-medium hover:bg-cyan-400">Siguiente</button>
+      <button id="lPlay" class="px-3 py-1.5 border border-[#2f5a7a] hover:bg-[#12293a]">${timer?'Pausar':'Reproducir'}</button></div>
+    <p class="text-xs text-slate-300 mt-3">Paso ${cur+1} de ${steps.length}: ${steps[cur][1]}</p>`
+};
+let tab = 'neu';
+function render(){
+  document.getElementById('tabBody').innerHTML = tabs[tab]();
+  document.querySelectorAll('.tab').forEach(b=>b.setAttribute('aria-selected', b.dataset.t===tab));
+  if(tab==='log'){
+    lNext.onclick=()=>{cur=(cur+1)%steps.length;render()};
+    lPrev.onclick=()=>{cur=(cur+steps.length-1)%steps.length;render()};
+    lPlay.onclick=()=>{ if(timer){clearInterval(timer);timer=null}else{timer=setInterval(()=>{cur=(cur+1)%steps.length;render()},1600)} render() };
+  }
+}
+document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>{tab=b.dataset.t;render()});
+render();
+
+/* ---------- Escena 3D ---------- */
+const cv = document.getElementById('cv');
+const renderer = new THREE.WebGLRenderer({canvas:cv, antialias:true});
+renderer.setPixelRatio(Math.min(devicePixelRatio,2));
+const scene = new THREE.Scene(); scene.background = new THREE.Color(0x08121b);
+const camera = new THREE.PerspectiveCamera(40,1,0.01,20);
+camera.position.set(0.9,0.15,1.1);
+const controls = new THREE.OrbitControls(camera, cv);
+controls.target.set(0,0.1,0); controls.enableDamping = true;
+scene.add(new THREE.AmbientLight(0xffffff,0.55));
+const dl = new THREE.DirectionalLight(0xffffff,0.9); dl.position.set(1,2,1.5); scene.add(dl);
+const grid = new THREE.GridHelper(2,20,0x22d3ee,0x16303f); grid.position.y=-0.52; scene.add(grid);
+
+const mat = (c,o={}) => new THREE.MeshStandardMaterial(Object.assign({color:c,metalness:0.5,roughness:0.45},o));
+const alu = mat(0x9fb4c4), dark = mat(0x2a3b4a), blue = mat(0x2563eb), red = mat(0xdc2626), steel = mat(0xe2e8f0,{metalness:0.9,roughness:0.2}), gold = mat(0xfbbf24);
+const box = (w,h,d,m)=>new THREE.Mesh(new THREE.BoxGeometry(w,h,d),m);
+const cyl = (r,h,m,seg=32)=>new THREE.Mesh(new THREE.CylinderGeometry(r,r,h,seg),m);
+
+// Muslo (fijo): rodilla en el origen, cadera en y = 0,4
+const thigh = new THREE.Group(); scene.add(thigh);
+const femur = box(0.07,0.4,0.05,alu); femur.position.y=0.2; thigh.add(femur);
+const hip = cyl(0.04,0.08,dark); hip.rotation.x=Math.PI/2; hip.position.y=0.4; thigh.add(hip);
+const belt = box(0.14,0.04,0.2,dark); belt.position.set(-0.02,0.44,0); thigh.add(belt);
+const kneeJ = cyl(0.04,0.1,gold); kneeJ.rotation.x=Math.PI/2; thigh.add(kneeJ);
+
+// Tibia (gira alrededor de la rodilla, flexión hacia atrás)
+const shank = new THREE.Group(); scene.add(shank);
+const tibia = box(0.06,0.4,0.045,alu); tibia.position.y=-0.2; shank.add(tibia);
+const foot = box(0.18,0.03,0.08,dark); foot.position.set(0.05,-0.415,0); shank.add(foot);
+const R = 0.10; // palanca excéntrica 10 cm
+const lever = box(R,0.02,0.03,blue); lever.position.set(-R/2,0,0.04); shank.add(lever);
+const pPin = cyl(0.014,0.05,steel); pPin.rotation.x=Math.PI/2; pPin.position.set(-R,0,0.04); shank.add(pPin);
+
+// Cilindro SDA40x80: base anclada al muslo, vástago a la palanca
+const B = new THREE.Vector3(-0.06,0.25,0.04);
+const anchor = cyl(0.015,0.05,steel); anchor.rotation.x=Math.PI/2; anchor.position.copy(B); thigh.add(anchor);
+const cg = new THREE.Group(); cg.position.copy(B); scene.add(cg);
+const BODY = 0.12;
+const body = cyl(0.03,BODY,red); body.position.y=BODY/2; cg.add(body);
+const rod = cyl(0.007,1,steel); cg.add(rod);
+
+// Vector fuerza
+const arrow = new THREE.ArrowHelper(new THREE.Vector3(0,1,0), new THREE.Vector3(), 0.1, 0x22d3ee, 0.03, 0.02); scene.add(arrow);
+
+const F = 400000*Math.PI*0.04*0.04/4; // 502,65 N
+const th0 = Math.PI/2; // flexión inicial 90°
+let theta = th0, target = th0, Lmin, Lmax;
+function geom(t){
+  const P = new THREE.Vector3(-R*Math.cos(t), R*Math.sin(t), 0.04);
+  return {P, L: P.distanceTo(B)};
+}
+Lmin = geom(th0).L; Lmax = geom(0).L;
+function updateBike(){
+  const phi=th0-theta, px=Rb*Math.sin(phi), py=Rb*Math.cos(phi), act=target<th0*0.5;
+  crank.rotation.z=-phi;
+  bArrow.position.set(px,py+0.17,0.09);
+  armLine.geometry.setFromPoints([new THREE.Vector3(0,py,0.09),new THREE.Vector3(px,py,0.09)]);
+  rAng.textContent=(phi*180/Math.PI).toFixed(0)+'°';
+  rStr.textContent=(px*1000).toFixed(0)+' mm';
+  rF.textContent=(act?F:0).toFixed(1)+' N';
+  rT.textContent=(act?F*px:0).toFixed(1)+' N·m';
+  bArrow.visible=act;
+}
+function update(){
+  if(mode==='bike'){updateBike();return}
+  shank.rotation.z = -theta;
+  const {P,L} = geom(theta);
+  const dir = P.clone().sub(B).normalize();
+  cg.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0), dir);
+  const rl = L-BODY; rod.scale.y = rl; rod.position.y = BODY+rl/2;
+  arrow.position.copy(P.clone().sub(dir.clone().multiplyScalar(0.12))); arrow.setDirection(dir);
+  const stroke = (L-Lmin)/(Lmax-Lmin)*88;
+  const active = target < th0*0.5;
+  const arm = Math.abs(P.x*dir.y - P.y*dir.x); // distancia perpendicular
+  const T = active ? F*arm : 0;
+  rAng.textContent = (theta*180/Math.PI).toFixed(0)+'°';
+  rStr.textContent = stroke.toFixed(0)+' mm';
+  rF.textContent = (active?F:0).toFixed(1)+' N';
+  rT.textContent = T.toFixed(1)+' N·m';
+  arrow.visible = active;
+}
+
+/* ---------- Ejemplo: bicicleta (biela-manivela) ---------- */
+const Rb = 0.175; // biela típica 17,5 cm
+const bike = new THREE.Group(); bike.visible=false; scene.add(bike);
+const seat = box(0.035,0.5,0.03,alu); seat.position.set(-0.097,0.23,0); seat.rotation.z=0.4; bike.add(seat);
+const bb = cyl(0.03,0.12,dark); bb.rotation.x=Math.PI/2; bike.add(bb);
+const crank = new THREE.Group(); bike.add(crank);
+const ring = cyl(0.09,0.01,steel,48); ring.rotation.x=Math.PI/2; ring.position.z=0.035; crank.add(ring);
+const carm = box(0.03,Rb,0.015,blue); carm.position.set(0,Rb/2,0.05); crank.add(carm);
+const ped = box(0.09,0.02,0.07,dark); ped.position.set(0,Rb,0.09); crank.add(ped);
+const bArrow = new THREE.ArrowHelper(new THREE.Vector3(0,-1,0), new THREE.Vector3(), 0.15, 0xf59e0b, 0.04, 0.025); bike.add(bArrow);
+const lg = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(),new THREE.Vector3(1,0,0)]);
+const armLine = new THREE.Line(lg, new THREE.LineBasicMaterial({color:0x22d3ee})); bike.add(armLine);
+let mode='leg';
+function setMode(m){
+  mode=m; theta=target=th0;
+  const b=m==='bike';
+  bike.visible=b; [thigh,shank,cg].forEach(o=>o.visible=!b);
+  bBike.setAttribute('aria-pressed',b);
+  bBike.textContent = b?'Volver a la rodilla':'Ejemplo: bicicleta';
+  bExt.textContent = b?'Pisar pedal (misma fuerza)':'Extender rodilla (4 bar)';
+  bRet.textContent = b?'Pedal arriba':'Reposo / retraer';
+  ttl.textContent = b?'Ejemplo: biela y pedal de bicicleta':'Rodilla y cilindro Airtac SDA40x80';
+  l1.textContent = b?'Giro de la biela':'Flexión de rodilla';
+  l2.textContent = b?'Brazo perpendicular':'Carrera del vástago';
+  l3.textContent = b?'Fuerza sobre el pedal':'Fuerza (F = P·A)';
+  desc.innerHTML = b
+   ? 'Es el mismo mecanismo: una fuerza lineal sobre una palanca fija a un eje. Acá la pierna pisa el pedal con <span class="mono text-cyan-300">502,6 N</span> (la misma del cilindro) sobre una biela de <span class="mono text-cyan-300">0,175 m</span>. El par es <span class="mono">T = F · d</span>, con d = la distancia horizontal entre el eje del pedalier y el pedal (línea cian). Con el pedal arriba d = 0 y no hay giro (punto muerto); con la biela horizontal d es máxima y el par llega a <span class="mono text-cyan-300">87,96 N·m</span>. En la rodilla pasa igual, pero con una palanca de 10 cm y un recorrido de solo 90°.'
+   : descLeg;
+}
+const descLeg = desc.innerHTML;
+bBike.onclick = ()=>setMode(mode==='leg'?'bike':'leg');
+bExt.onclick = ()=>{target=0};
+bRet.onclick = ()=>{target=th0};
+
+function resize(){
+  const w=cv.clientWidth,h=cv.clientHeight;
+  renderer.setSize(w,h,false); camera.aspect=w/h; camera.updateProjectionMatrix();
+}
+addEventListener('resize',resize); resize();
+const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
+(function loop(){
+  requestAnimationFrame(loop);
+  theta += (target-theta)*(still?1:0.035);
+  if(Math.abs(target-theta)<0.0005) theta=target;
+  update(); controls.update(); renderer.render(scene,camera);
+})();
+</script>
+</body>
+</html>
